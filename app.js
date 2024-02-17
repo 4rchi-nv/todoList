@@ -45,6 +45,7 @@ const tasks = [
       default: {
         '--base-text-color': '#212529',
         '--header-bg': '#007bff',
+        '--bg-theme': '#fff',
         '--header-text-color': '#fff',
         '--default-btn-bg': '#007bff',
         '--default-btn-text-color': '#fff',
@@ -65,7 +66,7 @@ const tasks = [
       dark: {
         '--base-text-color': '#212529',
         '--header-bg': '#343a40',
-        '--dark-theme': '#161616',
+        '--bg-theme': '#161616',
         '--header-text-color': '#fff',
         '--default-btn-bg': '#58616b',
         '--default-btn-text-color': '#fff',
@@ -88,6 +89,7 @@ const tasks = [
       light: {
         '--base-text-color': '#212529',
         '--header-bg': '#fff',
+        '--bg-theme': '#fff',
         '--header-text-color': '#212529',
         '--default-btn-bg': '#fff',
         '--default-btn-text-color': '#212529',
@@ -108,8 +110,9 @@ const tasks = [
         '--input-focus-box-shadow': '0 0 0 0.2rem rgba(141, 143, 146, 0.25)',
       },
     };
-    let lastSelectedTheme = 'default';
-    // Объявите новую переменную для хранения видимости задач
+    let lastSelectedTheme = localStorage.appTheme || 'default';
+
+    // новая переменная для хранения видимости задач
     let taskVisibility = 'all'; // 'all' - показать все, 'uncompleted' - показать незавершенные
 
   
@@ -119,9 +122,11 @@ const tasks = [
     const inputTitle = form.elements['title'];
     const inputBody = form.elements['body'];
     const selectedTheme = document.getElementById('themeSelect');
-    const filterContainer = document.querySelector('.filterContainer');
   
     //events
+    setTheme(lastSelectedTheme);
+    selectedTheme.value = localStorage.getItem('appTheme');;  
+    document.body.style.background = 'var(--bg-theme)';
     renderAllTasks(objOfTasks);
     form.addEventListener('submit', onSubmitHandler);
     listContainer.addEventListener('click', onDeleteHandler);
@@ -129,7 +134,6 @@ const tasks = [
     // filterContainer.addEventListener('click', filterTodos);
   
 
-// Обновите функцию renderAllTasks
 function renderAllTasks(objOfTasks) {
   const isEmpty = Object.keys(objOfTasks).length === 0;
 
@@ -161,7 +165,7 @@ function renderAllTasks(objOfTasks) {
       fragment.appendChild(list);
     });
 
-    listContainer.innerHTML = ''; // Очистите контейнер перед добавлением новых элементов
+    listContainer.innerHTML = ''; // Очистим контейнер перед добавлением новых элементов
     listContainer.appendChild(fragment);
   }
 }
@@ -194,7 +198,7 @@ document.getElementById('showUncompletedTasks').addEventListener('click', () => 
         span.style.fontWeight = 'bold';
         span.style.fontSize = '1.5rem';
         const completeBtn = document.createElement('button');
-        completeBtn.classList.add('btn', 'btn-success', 'ml-2', 'complete-btn');
+        completeBtn.classList.add('btn', 'btn-success', 'ml-auto', 'complete-btn');
         completeBtn.textContent = 'Complete';
         const deleteBtn = document.createElement('button');
         deleteBtn.classList.add('btn', 'btn-danger', 'ml-auto', 'delete-btn');
@@ -207,7 +211,7 @@ document.getElementById('showUncompletedTasks').addEventListener('click', () => 
         listItem.appendChild(deleteBtn);
         listItem.appendChild(article);
       
-        // Добавьте обработчик события для кнопки "Выполнено"
+        // обработчик события для кнопки "Выполнено"
         completeBtn.addEventListener('click', () => onCompleteHandler(_id));
       
         return listItem;
@@ -217,7 +221,7 @@ document.getElementById('showUncompletedTasks').addEventListener('click', () => 
         const task = objOfTasks[id];
         task.completed = !task.completed;
       
-        // Добавьте класс 'completed-task' и обновите стиль при выполнении задачи
+        // Добавляем класс 'completed-task' и обновите стиль при выполнении задачи
         const listItem = document.querySelector(`[data-task-id="${id}"]`);
         listItem.classList.toggle('completed-task', task.completed);
       }
@@ -227,10 +231,9 @@ document.getElementById('showUncompletedTasks').addEventListener('click', () => 
       const titleValue = inputTitle.value;
       const bodyValue = inputBody.value;
       if (!titleValue || !bodyValue) {
-        alert('Введите пж инпуты');
+        alert('Insert please your tasks in inputs!');
         return;
       };
-      //проверка
       const listItem = createTask(titleValue, bodyValue);
       const created = listItemTemplate(listItem);
       listContainer.insertAdjacentElement('afterbegin', created);
@@ -248,7 +251,7 @@ document.getElementById('showUncompletedTasks').addEventListener('click', () => 
     }
     function deleteTask(id) {
       const { title } = objOfTasks[id];
-      const isConfirm = confirm(`Вы правда хотите удалить [${title}]?`);
+      const isConfirm = confirm(`Do you want to delete task "${title}"?`);
       if(!isConfirm) return;
       delete objOfTasks[id];
       return isConfirm;
@@ -258,7 +261,7 @@ document.getElementById('showUncompletedTasks').addEventListener('click', () => 
         const parent = target.parentElement;
         const id = parent.dataset.taskId;
         const confirmed = deleteTask(id);
-              // Проверка наличия задач после удаления
+        // Проверка наличия задач после удаления
       if (Object.keys(objOfTasks).length === 0) {
           document.getElementById('noTasksMessage').style.display = 'block';
           listContainer.style.display = 'none';
@@ -268,12 +271,14 @@ document.getElementById('showUncompletedTasks').addEventListener('click', () => 
     }
     function onThemeChangeHandler(e) {
       const selectedValue = selectedTheme.value;
-      const isConfirm = confirm(`Вы дейст хотите выбрать тему ${selectedValue}`);
+      const isConfirm = confirm(`Do you want to change the theme to ${selectedValue}`);
       if(!isConfirm) {
         selectedTheme.value = lastSelectedTheme;
         return;
       };
       setTheme(selectedValue);
+      lastSelectedTheme = selectedValue;
+      localStorage.setItem('appTheme', lastSelectedTheme);  
     }
     function setTheme(name) {
       const selectedThemeObj = themes[name];

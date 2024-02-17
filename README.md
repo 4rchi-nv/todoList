@@ -1,2 +1,2 @@
 # todoList
-Primitive todolist
+Primitive todolist on Vanilla JS
