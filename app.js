@@ -221,7 +221,7 @@ document.getElementById('showUncompletedTasks').addEventListener('click', () => 
         const task = objOfTasks[id];
         task.completed = !task.completed;
       
-        // Добавляем класс 'completed-task' и обновите стиль при выполнении задачи
+        // Добавляем класс 'completed-task' и обновляем стиль при выполнении задачи
         const listItem = document.querySelector(`[data-task-id="${id}"]`);
         listItem.classList.toggle('completed-task', task.completed);
       }
@@ -254,6 +254,7 @@ document.getElementById('showUncompletedTasks').addEventListener('click', () => 
       const isConfirm = confirm(`Do you want to delete task "${title}"?`);
       if(!isConfirm) return;
       delete objOfTasks[id];
+      console.log(objOfTasks);
       return isConfirm;
   }
     function onDeleteHandler({ target }) {
@@ -284,7 +285,6 @@ document.getElementById('showUncompletedTasks').addEventListener('click', () => 
       const selectedThemeObj = themes[name];
   
       Object.entries(selectedThemeObj).forEach(([key, value]) => {
-        console.log(key, value);
         document.documentElement.style.setProperty(key, value);
       });
     }
